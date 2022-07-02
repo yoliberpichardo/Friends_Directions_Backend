@@ -7,8 +7,9 @@ const connectionString = process.env.DATA_BASE_URL;
 const setDatabase = () => {
     mongoose.connect(connectionString)
     .then(() => {
-        console.log('Database connected');
+        console.log('**** CONEXION CORRECTA ****')
     }).catch(err => {
+        console.log('**** ERROR DE CONEXION ****')
         console.error(err);
     })
 }
