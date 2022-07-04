@@ -7,9 +7,9 @@ const viewUser = async (req, res) => {
     })
 }
 
-const addUser = async(req, res) => {
+const register = async(req, res) => {
     console.log( req.body)
-    const user =  new User(req.body)
+    const user = new User(req.body)
 
     await user.save()
 
@@ -20,5 +20,5 @@ const addUser = async(req, res) => {
 
 module.exports = {
     viewUser,
-    addUser
+    register
 }
