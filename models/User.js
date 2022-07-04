@@ -6,8 +6,17 @@ const newUser = new Schema({
     direction: String,
     public: Boolean,
     friends: Array,
-    date: Date
+    date: {
+        type: Date,
+        default: new Date()
+    }
 
+})
+
+newUser.method("toJSON", function () {
+    const { __v, _id, ...rest } = this.toObject()
+    rest.uid = _id
+    return rest
 })
 
 const User = model('Users', newUser)
