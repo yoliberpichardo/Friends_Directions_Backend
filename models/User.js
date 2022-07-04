@@ -7,7 +7,7 @@ const newUser = new Schema({
     },
     email: {
         type: String,
-        unique: true,
+        unique: true
     },
     password: {
         type: String,
@@ -21,11 +21,18 @@ const newUser = new Schema({
     friends: {
         type: Array,
     },
-    date:  {
+    date:{
         type: Date,
+        default: new Date()
     }
-
 })
+
+newUser.method("toJSON",function (){
+    const { __v, _id, ...rest} = this.toObject()
+    rest.uid = _id
+    return rest
+})
+
 
 const User = model('Users', newUser)
 
