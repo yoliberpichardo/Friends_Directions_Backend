@@ -8,7 +8,7 @@ const PORT = process.env.PORT
 setDatabase()
 
 app.use(express.json());
-app.use('/get', require('./Routes/routes'))
+app.use('/', require('./Routes/routes'))
 app.use('/post', require('./Routes/routes'))
 
 app.listen(PORT,() =>{

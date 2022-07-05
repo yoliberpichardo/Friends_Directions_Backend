@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { model, Schema } = mongoose
 
-const newUser = new Schema({
+const register = new Schema({
     name: {
         type: String,
     },
@@ -28,12 +28,12 @@ const newUser = new Schema({
     }
 })
 
-newUser.method("toJSON",function (){
+register.method("toJSON",function (){
     const { __v, _id, ...rest} = this.toObject()
     rest.uid = _id
     return rest
 })
 
-const User = model('Users', newUser)
+const User = model('Users', register)
 
 module.exports = User
