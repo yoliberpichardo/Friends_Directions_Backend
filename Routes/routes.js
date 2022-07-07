@@ -6,7 +6,7 @@ const Router =  express.Router
 const router = Router()
 
 router.get('/',viewUser)
-router.post('/post',singInJWT,register)
-router.post('/post/login',verifyJWT,loginUser)
+router.post('/register',register)
+router.post('/login', loginUser)
 
 module.exports = router

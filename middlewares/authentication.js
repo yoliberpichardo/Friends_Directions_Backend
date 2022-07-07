@@ -2,15 +2,12 @@ const jwt = require('jsonwebtoken');
 
 //codificar password
 
-const singInJWT = (req, res) => {
-    jwt.sign({password: req.body.password}, 'secretKey', (err, token) => {
-        try {
-            res.status(200).json({
-                token
-            })
-        } catch {
-            res.status(500).error(err)
-        }
+const singInJWT = (user) => {
+    return new Promise((resolve, reject) => {
+        jwt.sign({user}, process.env.SECRET_KEY, (err, token) => {
+            if(err) reject(err)
+            resolve(token)
+        })
     })
 }
 
