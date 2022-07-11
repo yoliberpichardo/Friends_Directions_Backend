@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const {singInJWT} = require('../middlewares/authentication')
 
 const viewUser = async (req, res) => {
@@ -56,10 +55,27 @@ const loginUser = async(req, res) => {
     })
 }
 
+const editUser = async(req, res) => {
+    const id = req.params.id
+    const params = req.
+    console.log(params);
 
+    // const user = await User.findById(id)
+
+    // if(!user){
+    //     return res.status(404).json({
+    //         msj: "este id no esta registrado"
+    //     })
+    // }
+
+    // // res.status(200).json({
+    // //     user
+    // // })
+}
 
 module.exports = {
     viewUser,
     register,
-    loginUser
+    loginUser,
+    editUser
 }
