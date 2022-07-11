@@ -50,9 +50,9 @@ const loginUser = async(req, res) => {
 
     const token = await singInJWT(user)
 
-    console.log(token);
     res.status(200).json({
-            token
+            token,
+            user
     })
 }
 

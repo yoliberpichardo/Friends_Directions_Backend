@@ -12,8 +12,6 @@ setDatabase()
 app.use(express.json());
 app.use(cors())
 app.use('/',require('./Routes/routes'))
-app.use('/', require('./Routes/routes'))
-app.use('/', require('./Routes/routes'))
 
 app.listen(PORT,() =>{
     console.log(`Listenend on port http://localhost:${PORT}`)

@@ -13,14 +13,16 @@ const register = new Schema({
         type: String,
     },
     direction: {
-        type: String,
+        type: Array,
+        default: []
     },
     public: {
         type: Boolean,
-        default: false
+        default: true
     },
     friends: {
         type: Array,
+        default: []
     },
     date:{
         type: Date,
