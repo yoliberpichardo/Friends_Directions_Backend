@@ -4,10 +4,12 @@ const { model, Schema } = mongoose
 const register = new Schema({
     name: {
         type: String,
+        required: true
     },
     email: {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
     password: {
         type: String,
@@ -27,7 +29,8 @@ const register = new Schema({
     date:{
         type: Date,
         default: new Date()
-    }
+    },
+
 })
 
 register.method("toJSON",function (){

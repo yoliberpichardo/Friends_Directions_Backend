@@ -1,76 +1,122 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt')
-const {singInJWT} = require('../middlewares/authentication')
+const { singInJWT } = require('../middlewares/authentication')
 
 const viewUser = async (req, res) => {
-    const data = await User.find()  
+    const data = await User.find()
     res.json({
         data
     })
 }
 
-const register = async(req, res) => {
-    const {name, email, password, direction, public, friends} = req.body
+const register = async (req, res) => {
+    const { name, email, password} = req.body
+    let errors = [];
 
-    const passwordHash = await bcrypt.hash(password, 8)
-    const user = new User({
-        name,
-        email,
-        password: passwordHash,
-        direction,
-        public,
-        friends
-    })
+    if (!name || !email || !password) {
+        errors.push({ msg: 'Please enter all fields' });
+    }
 
-    await user.save()
-    
-    res.status(200).json({
-       user
-    })
+    if (password.length < 6) {
+        errors.push({ msg: 'Password must be at least 6 characters' });
+    }
+
+    if (errors.length > 0) {
+        res.json({
+          errors,
+          name,
+          email,
+          password,
+        });
+    }else {
+        const passwordHash = await bcrypt.hash(password, 8)
+        const user = new User({
+            name,
+            email,
+            password: passwordHash,
+            direction,
+            public,
+            friends
+        })
+
+        await user.save()
+
+        res.status(200).json({
+            user
+        })
+    }
 }
 
-const loginUser = async(req, res) => { 
-    const {email, password} = req.body
+const loginUser = async (req, res) => {
+    const { email, password } = req.body
+    let errors = []
+    const comparePassword = ''
 
-    const user = await User.findOne({email})
-    if(!user){
-        return res.status(404).json({
-            msj: "este email no esta registrado"
-        })
+    if (!email || !password) {
+        errors.push({ msg: 'Please enter all fields' });
     }
 
-    const comparePassword = bcrypt.compareSync(password, user.password)
-
-    if(!comparePassword){
-        return res.status(404).json({
-            msj: "este email no esta registrado"
-        })
+    const user = await User.findOne({ email })
+    if (!user) {
+        errors.push({msj: "este usuario no esta registrado"})
+    } else{
+        comparePassword = bcrypt.compareSync(password, user.password)
     }
 
-    const token = await singInJWT(user)
+   
 
-    res.status(200).json({
+    if (!comparePassword) {
+        errors.push({msj: "esta contraseña no es correcta"})
+    }
+
+    if(errors.length > 0){
+       res.json({
+        errors,
+        password,
+        email
+       })
+    } else {
+        const token = await singInJWT(user)
+
+        res.status(200).json({
             token,
             user
-    })
+        })
+    }
 }
 
-const editUser = async(req, res) => {
+const editUser = async (req, res) => {
     const id = req.params.id
-    const params = req.
-    console.log(params);
+    const { direction, public } = req.body
 
-    // const user = await User.findById(id)
 
-    // if(!user){
-    //     return res.status(404).json({
-    //         msj: "este id no esta registrado"
-    //     })
-    // }
+    const user = await User.findById(id)
 
-    // // res.status(200).json({
-    // //     user
-    // // })
+    if (!user) {
+        return res.status(404).json({
+            msj: "este usuario no esta registrado"
+        })
+    }
+
+    // change direction
+    if(direction) {
+        user.direction = direction
+    }
+
+    // change public 
+    if(public){
+        user.public = public
+    }
+
+
+    user.save()
+
+
+    res.status(200).json({
+        msj: "ok", user
+    })
+
+
 }
 
 module.exports = {

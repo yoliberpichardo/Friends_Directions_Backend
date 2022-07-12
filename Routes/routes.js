@@ -8,6 +8,6 @@ const router = Router()
 router.get('/user',viewUser)
 router.post('/register',register)
 router.post('/login', loginUser)
-router.put('/direction/:id', editUser)
+router.put('/edit/:id', editUser)
 
 module.exports = router
