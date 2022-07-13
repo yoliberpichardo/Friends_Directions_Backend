@@ -4,9 +4,9 @@ const { singInJWT } = require('../middlewares/authentication')
 
 const viewUser = async (req, res) => {
     const data = await User.find()
-    res.json({
-        data
-    })
+    res.json([{
+        senadores
+    }])
 }
 
 const register = async (req, res) => {
@@ -111,19 +111,32 @@ const editUser = async (req, res) => {
 }
 
 const resquetSend = async (req,res) => {
-    const {name, index} = req.body
     const {id} = req.params
-
-    const friends = await User.find({name})
+    let errors = []
+    
     const user = await User.findById(id)
 
-    if(!friends[index].resquet_send.indexOf(id) > -1){
+
+    if(!user){
+        errors.push({msg: 'el usuario no existe'})
+    }
+
+    if(user[index].resquet_send.indexOf(id) > -1){
+      errors.push({msg: 'ya has enviado la solicitud'})  
+    } else {
         friends[index].request_received.push(id)
         user.resquet_send.push(friends[index]._id)
     }
-    
-    
-    user.save()
+
+    if(errors.length > 0){
+        res.json({
+            errors,
+            user,
+            friends,
+            name
+        })
+    } else{
+        user.save()
     friends[index].save()
 
     res.status(200).json({
@@ -131,6 +144,9 @@ const resquetSend = async (req,res) => {
         friends,
         user
     })
+    }
+     
+    
 }
 
 module.exports = {
