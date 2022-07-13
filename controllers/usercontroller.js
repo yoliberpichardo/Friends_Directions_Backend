@@ -33,10 +33,7 @@ const register = async (req, res) => {
         const user = new User({
             name,
             email,
-            password: passwordHash,
-            direction,
-            public,
-            friends
+            password: passwordHash
         })
 
         await user.save()
@@ -61,9 +58,7 @@ const loginUser = async (req, res) => {
         errors.push({msj: "este usuario no esta registrado"})
     } else{
         comparePassword = bcrypt.compareSync(password, user.password)
-    }
-
-   
+    }   
 
     if (!comparePassword) {
         errors.push({msj: "esta contraseña no es correcta"})
@@ -89,7 +84,6 @@ const editUser = async (req, res) => {
     const id = req.params.id
     const { direction, public } = req.body
 
-
     const user = await User.findById(id)
 
     if (!user) {
@@ -108,20 +102,41 @@ const editUser = async (req, res) => {
         user.public = public
     }
 
-
     user.save()
-
 
     res.status(200).json({
         msj: "ok", user
     })
 
+}
 
+const resquetSend = async (req,res) => {
+    const {name, index} = req.body
+    const {id} = req.params
+
+    const friends = await User.find({name})
+    const user = await User.findById(id)
+
+    if(!friends[index].resquet_send.indexOf(id) > -1){
+        friends[index].request_received.push(id)
+        user.resquet_send.push(friends[index]._id)
+    }
+    
+    
+    user.save()
+    friends[index].save()
+
+    res.status(200).json({
+        msg: 'ok',
+        friends,
+        user
+    })
 }
 
 module.exports = {
     viewUser,
     register,
     loginUser,
-    editUser
+    editUser,
+    resquetSend
 }

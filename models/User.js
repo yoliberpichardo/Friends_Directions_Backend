@@ -30,6 +30,14 @@ const register = new Schema({
         type: Date,
         default: new Date()
     },
+    request_received:{
+        type: Array,
+        default: []
+    },
+    resquet_send:{
+        type: Array,
+        default: []
+    }
 
 })
 
