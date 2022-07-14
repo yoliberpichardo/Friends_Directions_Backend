@@ -4,9 +4,9 @@ const { singInJWT } = require('../middlewares/authentication')
 
 const viewUser = async (req, res) => {
     const data = await User.find()
-    res.json([{
-        senadores
-    }])
+    res.json({
+        data
+    })
 }
 
 const register = async (req, res) => {
@@ -47,7 +47,7 @@ const register = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body
     let errors = []
-    const comparePassword = ''
+    let comparePassword = ''
 
     if (!email || !password) {
         errors.push({ msg: 'Please enter all fields' });
@@ -111,41 +111,34 @@ const editUser = async (req, res) => {
 }
 
 const resquetSend = async (req,res) => {
-    const {id} = req.params
-    let errors = []
+    const {friendID} = req.body
+    const myID = req.token
     
-    const user = await User.findById(id)
+    const friend = await User.findById(friendID)
+    const user = await User.findById(myID)
 
-
-    if(!user){
-        errors.push({msg: 'el usuario no existe'})
+    if(friend._id === friendID){
+        return res.status(500).json({
+            msg: "No puedes enviarte solicitud"
+        })
     }
 
-    if(user[index].resquet_send.indexOf(id) > -1){
-      errors.push({msg: 'ya has enviado la solicitud'})  
-    } else {
-        friends[index].request_received.push(id)
-        user.resquet_send.push(friends[index]._id)
-    }
-
-    if(errors.length > 0){
-        res.json({
-            errors,
-            user,
-            friends,
-            name
+    if(!friend || !user){
+        return res.status(404).json({
+            msg: "El usuario no existe"
         })
     } else{
-        user.save()
-    friends[index].save()
-
-    res.status(200).json({
-        msg: 'ok',
-        friends,
-        user
-    })
+        friend.request_received.push(myID)
+        user.resquet_send.push(myID)
     }
-     
+
+    
+    await friend.save()
+    await user.save()
+    res.status(200).json({
+        msg: 'solicitud enviada',
+        user
+    })   
     
 }
 

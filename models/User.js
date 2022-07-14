@@ -42,7 +42,7 @@ const register = new Schema({
 })
 
 register.method("toJSON",function (){
-    const { __v, _id, ...rest} = this.toObject()
+    const { __v, _id, password, ...rest} = this.toObject()
     rest.uid = _id
     return rest
 })
