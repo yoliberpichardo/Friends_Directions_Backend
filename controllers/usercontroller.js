@@ -3,9 +3,19 @@ const bcrypt = require('bcrypt')
 const { singInJWT } = require('../middlewares/authentication')
 
 const viewUser = async (req, res) => {
+    const myID = req.token
+    console.log(myID);
+
     const data = await User.find()
-    res.json({
-        data
+    
+    const dataFilter = data.filter(element => {
+        if(element._id != myID){
+           return element
+        }
+    })
+
+    res.status(200).json({
+        dataFilter
     })
 }
 
@@ -38,7 +48,7 @@ const register = async (req, res) => {
 
         await user.save()
 
-        res.status(200).json({
+        return res.status(200).json({
             user
         })
     }
@@ -65,7 +75,7 @@ const loginUser = async (req, res) => {
     }
 
     if(errors.length > 0){
-       res.json({
+        return res.json({
         errors,
         password,
         email
@@ -104,7 +114,7 @@ const editUser = async (req, res) => {
 
     user.save()
 
-    res.status(200).json({
+    return res.status(200).json({
         msj: "ok", user
     })
 

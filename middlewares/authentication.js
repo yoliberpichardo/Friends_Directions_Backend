@@ -20,7 +20,7 @@ const verifyJWT = (req, res, next) =>{
         const bearerToken = bearerHeader.split(" ")[1]
         jwt.verify(bearerToken, process.env.SECRET_KEY, (err, payload) => {
             if(err){
-                return res.senStatus(403).json({
+                return res.status(403).json({
                     msg: 'no authorize'
                 })
             }
