@@ -1,10 +1,11 @@
 const express = require('express')
 const { verifyJWT} = require('../middlewares/authentication')
-const {viewUser, register, loginUser, editUser, resquetSend} = require('../controllers/usercontroller')
+const {viewUser, register, loginUser, editUser, resquetSend, myUser} = require('../controllers/usercontroller')
 const Router =  express.Router
 
 const router = Router()
 
+router.post('/myuser', verifyJWT, myUser)
 router.post('/user',verifyJWT,viewUser)
 router.post('/register',register)
 router.post('/login', loginUser)

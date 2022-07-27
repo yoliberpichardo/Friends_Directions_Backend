@@ -2,6 +2,22 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt')
 const { singInJWT } = require('../middlewares/authentication')
 
+const myUser = async (req, res) => {
+    const myID = req.token
+
+    const data0 = await User.find()
+    
+    const data = data0.filter(element => {
+        if(element._id == myID){
+           return element
+        }
+    })
+
+    res.status(200).json({
+        data
+    })
+}
+
 const viewUser = async (req, res) => {
     const myID = req.token
 
@@ -137,5 +153,6 @@ module.exports = {
     register,
     loginUser,
     editUser,
-    resquetSend
+    resquetSend,
+    myUser
 }
