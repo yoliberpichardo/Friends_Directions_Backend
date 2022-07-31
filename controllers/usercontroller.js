@@ -148,11 +148,37 @@ const resquetSend = async (req,res) => {
     
 }
 
+const getNumberFriends = async(req,res) => {
+    const myID = req.token
+
+    const data = await User.findById(myID)
+
+    if(!data){
+        res.status(404).json({
+            msg: 'Este usuario no existe'
+        })
+    }
+
+    res.status(200).json({
+        data
+    })
+}
+
+const getUsersRequest = async (req, res) => {
+    const {usersID} = req.body
+
+    const data = await User.find({_id: usersID})
+
+    console.log(data);
+}
+
 module.exports = {
     viewUser,
     register,
     loginUser,
     editUser,
     resquetSend,
-    myUser
+    myUser,
+    getNumberFriends,
+    getUsersRequest
 }
