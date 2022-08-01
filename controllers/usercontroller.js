@@ -148,11 +148,43 @@ const resquetSend = async (req,res) => {
     
 }
 
+const getFriendsNumber = async (req,res) => {
+    const myID = req.token
+
+    const data = await User.findById(myID).select("request_received -_id")
+
+    console.log(data);
+
+    if (!data) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
+
+    res.status(200).json({
+        data
+    })
+
+}
+
+const getUsersByID = async (req,res) => {
+    const {usersID} = req.body
+
+    const data = await User.find({_id: {$in: usersID}}).lean()
+
+    res.status(200).json({
+        data
+    })
+
+}
+
 module.exports = {
     viewUser,
     register,
     loginUser,
     editUser,
     resquetSend,
-    myUser
+    myUser,
+    getFriendsNumber,
+    getUsersByID
 }
