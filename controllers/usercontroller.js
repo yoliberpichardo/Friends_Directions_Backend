@@ -87,7 +87,6 @@ const loginUser = async (req, res) => {
 }
 
 const editUser = async (req, res) => {
-    const id = req.params.id
     const { direction, public } = req.body
 
     const user = await User.findById(id)
@@ -151,9 +150,7 @@ const resquetSend = async (req,res) => {
 const getFriendsNumber = async (req,res) => {
     const myID = req.token
 
-    const data = await User.findById(myID).select("request_received -_id")
-
-    console.log(data);
+    const data = await User.findById(myID).select("request_received - _id")
 
     if (!data) {
         return res.status(404).json({
@@ -172,10 +169,36 @@ const getUsersByID = async (req,res) => {
 
     const data = await User.find({_id: {$in: usersID}}).lean()
 
-    res.status(200).json({
-        data
-    })
+    if (!data) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
 
+    res.status(200).json({
+        data 
+    })
+}
+
+const acceptFriend = async (req,res) => {
+    const {userID} = req.body
+    const myID = req.token
+
+    const myUser = await User.findById(myID)
+    const user = await User.findById(userID)
+
+
+    if (!user || !myUser) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
+
+    console.log(user, myUser);
+    
+    res.status(200).json({
+        msg: 'solicitud acceptada'
+    })
 }
 
 module.exports = {
@@ -186,5 +209,6 @@ module.exports = {
     resquetSend,
     myUser,
     getFriendsNumber,
-    getUsersByID
+    getUsersByID,
+    acceptFriend
 }
