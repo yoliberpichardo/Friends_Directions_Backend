@@ -134,7 +134,7 @@ const resquetSend = async (req,res) => {
         })
     } else{
         friend.request_received.push(myID)
-        user.resquet_send.push(friend._id)
+        user.resquet_send.push(friend.id)
     }
 
     
@@ -168,7 +168,6 @@ const getUsersByID = async (req,res) => {
     const {usersID} = req.body
 
     const data = await User.find({_id: {$in: usersID}}).lean()
-
     if (!data) {
         return res.status(404).json({
             msg: "usuario no encontrado"
@@ -184,17 +183,28 @@ const acceptFriend = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
 
-    const myUser = await User.findById(myID)
-    const user = await User.findById(userID)
+    const myUser = await User.findByIdAndUpdate(myID, {$push:{"friends": userID}, })
+    const user = await User.findByIdAndUpdate(userID)
 
-
+    
     if (!user || !myUser) {
         return res.status(404).json({
             msg: "usuario no encontrado"
         })
     }
 
-    console.log(user, myUser);
+    // myUser.update({"request_received": userID}, {$push:{"friends": userID}})
+    
+    console.log(myUser);
+    // myUser.request_received.filter( element => {
+    //     console.log(element != userID);
+    //     if(element == userID){
+    //         myUser.friends.push(element)
+    //         user.friends.push(myUser)
+    //         myUser.deleteOne({request_received: element})
+    //     }
+    //     return element
+    // }) 
     
     res.status(200).json({
         msg: 'solicitud acceptada'
