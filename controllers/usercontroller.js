@@ -150,7 +150,7 @@ const resquetSend = async (req,res) => {
 const getFriendsNumber = async (req,res) => {
     const myID = req.token
 
-    const data = await User.findById(myID).select("request_received - _id")
+    const data = await User.findById(myID).select("request_received -_id")
 
     if (!data) {
         return res.status(404).json({
@@ -183,8 +183,11 @@ const acceptFriend = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
 
-    const myUser = await User.findByIdAndUpdate(myID, {$push:{"friends": userID}, })
-    const user = await User.findByIdAndUpdate(userID)
+    const myUser = await User.findByIdAndUpdate(myID, {$push: {'friends': userID}}, {new: true})
+    const myUser1 = await User.findByIdAndUpdate(myID,{$pull: {'request_received': userID}}, {new: true})
+    const user = await User.findByIdAndUpdate(userID, {$push: {'friends': myID}}, {new: true})
+    const user1 = await User.findByIdAndUpdate(userID, {$push: {$pull: {'request_send': myID}}}, {new: true})
+
 
     
     if (!user || !myUser) {
@@ -192,19 +195,9 @@ const acceptFriend = async (req,res) => {
             msg: "usuario no encontrado"
         })
     }
-
-    // myUser.update({"request_received": userID}, {$push:{"friends": userID}})
+ 
     
-    console.log(myUser);
-    // myUser.request_received.filter( element => {
-    //     console.log(element != userID);
-    //     if(element == userID){
-    //         myUser.friends.push(element)
-    //         user.friends.push(myUser)
-    //         myUser.deleteOne({request_received: element})
-    //     }
-    //     return element
-    // }) 
+    console.log(myUser,myUser1,user,user1);
     
     res.status(200).json({
         msg: 'solicitud acceptada'
