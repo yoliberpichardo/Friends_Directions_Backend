@@ -34,7 +34,7 @@ const register = new Schema({
         type: Array,
         default: []
     },
-    resquet_send:{
+    request_send:{
         type: Array,
         default: []
     }

@@ -115,7 +115,7 @@ const editUser = async (req, res) => {
 
 }
 
-const resquetSend = async (req,res) => {
+const requestSend = async (req,res) => {
     const {friendID} = req.body
     const myID = req.token
     
@@ -134,7 +134,7 @@ const resquetSend = async (req,res) => {
         })
     } else{
         friend.request_received.push(myID)
-        user.resquet_send.push(friend.id)
+        user.request_send.push(friend.id)
     }
 
     
@@ -183,10 +183,11 @@ const acceptFriend = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
 
-    const myUser = await User.findByIdAndUpdate(myID, {$push: {'friends': userID}}, {new: true})
-    const myUser1 = await User.findByIdAndUpdate(myID,{$pull: {'request_received': userID}}, {new: true})
-    const user = await User.findByIdAndUpdate(userID, {$push: {'friends': myID}}, {new: true})
-    const user1 = await User.findByIdAndUpdate(userID, {$push: {$pull: {'request_send': myID}}}, {new: true})
+    // const myUser = await User.findById(myID)
+    // const user = await User.findById(userID)
+
+    const myUser = await User.findByIdAndUpdate(myID,{$push: {'friends': userID}, $pull: {'request_received': userID}}, {new: true})
+    const user = await User.findByIdAndUpdate(userID, {$push: {'friends': myID}, $pull: {'request_send': myID}}, {new: true})
 
 
     
@@ -197,7 +198,7 @@ const acceptFriend = async (req,res) => {
     }
  
     
-    console.log(myUser,myUser1,user,user1);
+    console.log(myUser, user, 'dssdfsdfsd');
     
     res.status(200).json({
         msg: 'solicitud acceptada'
@@ -209,7 +210,7 @@ module.exports = {
     register,
     loginUser,
     editUser,
-    resquetSend,
+    requestSend,
     myUser,
     getFriendsNumber,
     getUsersByID,
