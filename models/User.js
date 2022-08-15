@@ -41,6 +41,8 @@ const register = new Schema({
 
 })
 
+register.index({name: 'text'})
+
 register.method("toJSON",function (){
     const { __v, _id, password, ...rest} = this.toObject()
     rest.uid = _id

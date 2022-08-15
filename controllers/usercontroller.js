@@ -205,6 +205,36 @@ const acceptFriend = async (req,res) => {
     })
 }
 
+const getAllUsers = async (req, res) => {
+    const myID = req.token
+    let {q = ''} = req.query
+    q = q.toString().toLocaleLowerCase();
+
+    if(!q){
+        const [dataFriends, dataPublic] = await Promise.all([ 
+            User.find({'friends': {$in: myID}}),
+            User.find({'public': true, 'friends': {$nin: myID} })
+        ])
+
+        return res.status(200).json({
+            dataFriends,
+            dataPublic
+        })
+    }
+
+    const [dataFriends, dataPublic] = await Promise.all([ 
+        User.find({'name': {$regex: q, $options: "i"},'friends': {$in: myID}}),
+        User.find({'name': {$regex: q, $options: "i"} ,'public': true, 'friends': {$nin: myID} })
+    ])
+
+    console.log(dataFriends,dataPublic);
+
+    return res.status(200).json({
+        dataFriends,
+        dataPublic
+    })
+}
+
 module.exports = {
     viewUser,
     register,
@@ -214,5 +244,6 @@ module.exports = {
     myUser,
     getFriendsNumber,
     getUsersByID,
-    acceptFriend
+    acceptFriend,
+    getAllUsers
 }

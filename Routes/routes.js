@@ -1,6 +1,6 @@
 const express = require('express')
 const { verifyJWT} = require('../middlewares/authentication')
-const {viewUser, register, loginUser, editUser, requestSend, myUser, getFriendsNumber, getUsersByID, acceptFriend} = require('../controllers/usercontroller')
+const {viewUser, register, loginUser, editUser, requestSend, myUser, getFriendsNumber, getUsersByID, acceptFriend, getAllUsers} = require('../controllers/usercontroller')
 const Router =  express.Router
 
 const router = Router()
@@ -14,5 +14,6 @@ router.put('/edit', verifyJWT,editUser)
 router.post('/resquet_send',verifyJWT, requestSend)
 router.post('/get_users',verifyJWT, getUsersByID)
 router.put('/accept_friend',verifyJWT, acceptFriend)
+router.get('/dataAll', verifyJWT, getAllUsers)
 
 module.exports = router
