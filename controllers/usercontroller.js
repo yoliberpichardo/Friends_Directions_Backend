@@ -164,32 +164,18 @@ const getFriendsNumber = async (req,res) => {
 
 }
 
-const getUsersByID = async (req,res) => {
-    const {usersID} = req.body
-
-    const data = await User.find({_id: {$in: usersID}}).lean()
-    if (!data) {
-        return res.status(404).json({
-            msg: "usuario no encontrado"
-        })
-    }
-
-    res.status(200).json({
-        data 
-    })
-}
 
 const acceptFriend = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
-
+    
     // const myUser = await User.findById(myID)
     // const user = await User.findById(userID)
-
+    
     const myUser = await User.findByIdAndUpdate(myID,{$push: {'friends': userID}, $pull: {'request_received': userID}}, {new: true})
     const user = await User.findByIdAndUpdate(userID, {$push: {'friends': myID}, $pull: {'request_send': myID}}, {new: true})
-
-
+    
+    
     
     if (!user || !myUser) {
         return res.status(404).json({
@@ -209,13 +195,13 @@ const getAllUsers = async (req, res) => {
     const myID = req.token
     let {q = ''} = req.query
     q = q.toString().toLocaleLowerCase();
-
+    
     if(!q){
         const [dataFriends, dataPublic] = await Promise.all([ 
             User.find({'friends': {$in: myID}}),
             User.find({'public': true, 'friends': {$nin: myID} })
         ])
-
+        
         return res.status(200).json({
             dataFriends,
             dataPublic
@@ -226,12 +212,49 @@ const getAllUsers = async (req, res) => {
         User.find({'name': {$regex: q, $options: "i"},'friends': {$in: myID}}),
         User.find({'name': {$regex: q, $options: "i"} ,'public': true, 'friends': {$nin: myID} })
     ])
-
+    
     console.log(dataFriends,dataPublic);
-
+    
     return res.status(200).json({
         dataFriends,
         dataPublic
+    })
+}
+
+const getUsersByID = async (req,res) => {
+    const myID = req.token
+    let {q = ''} = req.query
+    q = q.toString().toLocaleLowerCase();
+
+    const data = await User.find({'name': {$regex: q, $options: "i"}, 'friends': {$nin: myID}})
+
+    console.log(data);
+    if (!data) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
+
+    res.status(200).json({
+        data 
+    })
+}
+
+const searchUsers = async (req,res) => {
+    const myID = req.token
+    const {usersID} = req.body
+
+    const data = await User.find({_id: {$in: usersID} })
+
+    console.log(data);
+    if (!data) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
+
+    res.status(200).json({
+        data 
     })
 }
 
@@ -245,5 +268,6 @@ module.exports = {
     getFriendsNumber,
     getUsersByID,
     acceptFriend,
-    getAllUsers
+    getAllUsers,
+    searchUsers
 }
