@@ -184,12 +184,39 @@ const acceptFriend = async (req,res) => {
     }
  
     
-    console.log(myUser, user, 'dssdfsdfsd');
-    
     res.status(200).json({
         msg: 'solicitud acceptada'
     })
 }
+
+const declineRequest = async (req,res) => {
+    const {userID} = req.body
+    const myID = req.token
+
+    // const myUser = await User.findById(myID)
+    // const user = await User.findById(userID)
+
+    const myUser = await User.findByIdAndUpdate(myID,{$pull: {'request_received': userID}}, {new: true})
+    const user = await User.findByIdAndUpdate(userID, {$pull: {'request_send': myID}}, {new: true})
+
+    console.log(myUser, user);
+
+    if (!user || !myUser) {
+        return res.status(404).json({
+            msg: "usuario no encontrado"
+        })
+    }
+
+    res.status(200).json({
+        msg: 'solicitud rechazada'
+    })
+}
+    
+    
+    
+    
+ 
+    
 
 const getAllUsers = async (req, res) => {
     const myID = req.token
@@ -212,8 +239,6 @@ const getAllUsers = async (req, res) => {
         User.find({'name': {$regex: q, $options: "i"},'friends': {$in: myID}}),
         User.find({'name': {$regex: q, $options: "i"} ,'public': true, 'friends': {$nin: myID} })
     ])
-    
-    console.log(dataFriends,dataPublic);
     
     return res.status(200).json({
         dataFriends,
@@ -246,7 +271,6 @@ const searchUsers = async (req,res) => {
 
     const data = await User.find({_id: {$in: usersID} })
 
-    console.log(data);
     if (!data) {
         return res.status(404).json({
             msg: "usuario no encontrado"
@@ -269,5 +293,6 @@ module.exports = {
     getUsersByID,
     acceptFriend,
     getAllUsers,
-    searchUsers
+    searchUsers,
+    declineRequest
 }
