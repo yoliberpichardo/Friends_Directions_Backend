@@ -118,9 +118,9 @@ const editUser = async (req, res) => {
 const requestSend = async (req,res) => {
     const {friendID} = req.body
     const myID = req.token
-    
-    const friend = await User.findById(friendID)
-    const user = await User.findById(myID)
+
+    const myuser = await User.findByIdAndUpdate(myID,{$push: {'request_send': friendID}}, {new: true})
+    const friend = await User.findByIdAndUpdate(friendID,{$push: {'request_received': myID}}, {new: true})
 
     if(friend._id === myID){
         return res.status(500).json({
@@ -128,21 +128,15 @@ const requestSend = async (req,res) => {
         })
     }
 
-    if(!friend || !user){
+    if(!friend || !myuser){
         return res.status(404).json({
             msg: "El usuario no existe"
         })
-    } else{
-        friend.request_received.push(myID)
-        user.request_send.push(friend.id)
-    }
+    } 
 
-    
-    await friend.save()
-    await user.save()
     res.status(200).json({
         msg: 'solicitud enviada',
-        user
+        myuser
     })   
     
 }
@@ -169,8 +163,6 @@ const acceptFriend = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
     
-    // const myUser = await User.findById(myID)
-    // const user = await User.findById(userID)
     
     const myUser = await User.findByIdAndUpdate(myID,{$push: {'friends': userID}, $pull: {'request_received': userID}}, {new: true})
     const user = await User.findByIdAndUpdate(userID, {$push: {'friends': myID}, $pull: {'request_send': myID}}, {new: true})
@@ -193,13 +185,9 @@ const declineRequest = async (req,res) => {
     const {userID} = req.body
     const myID = req.token
 
-    // const myUser = await User.findById(myID)
-    // const user = await User.findById(userID)
-
     const myUser = await User.findByIdAndUpdate(myID,{$pull: {'request_received': userID}}, {new: true})
     const user = await User.findByIdAndUpdate(userID, {$pull: {'request_send': myID}}, {new: true})
 
-    console.log(myUser, user);
 
     if (!user || !myUser) {
         return res.status(404).json({
@@ -253,7 +241,6 @@ const getUsersByID = async (req,res) => {
 
     const data = await User.find({'name': {$regex: q, $options: "i"}, 'friends': {$nin: myID}})
 
-    console.log(data);
     if (!data) {
         return res.status(404).json({
             msg: "usuario no encontrado"
