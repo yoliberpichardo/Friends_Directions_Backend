@@ -5,13 +5,7 @@ const { singInJWT } = require('../middlewares/authentication')
 const myUser = async (req, res) => {
     const myID = req.token
 
-    const data0 = await User.find()
-
-    const data = data0.filter(element => {
-        if (element._id == myID) {
-            return element
-        }
-    })
+    const data = await User.findById(myID)
 
     res.status(200).json({
         data
@@ -86,34 +80,39 @@ const loginUser = async (req, res) => {
     })
 }
 
-const editUser = async (req, res) => {
+const editUserDirection = async (req, res) => {
     const myID = req.token
-    const { direction, public } = req.body
+    const { direction } = req.body
 
-    const user = await User.findById(myID)
+    const user = await User.findByIdAndUpdate(myID, {$set: { 'direction': direction } }, { new: true })
 
-    if (!user) {
-        return res.status(404).json({
-            msg: "este usuario no esta registrado"
+    if(!user){
+        return res.json({
+            msg: "Este usuario no se encuentra"
         })
     }
 
-    console.log(user.direction);
+    return res.status(200).json({
+        msg: "cambio realizado", user
+    })
 
-    // change direction
-    if (direction) {
-        user.direction = direction
+}
+
+const editUserPublic = async (req, res) => {
+    const myID = req.token
+    const { isPublic } = req.body
+
+    
+    const user = await User.findByIdAndUpdate(myID, { 'public': isPublic }, { new: true })
+
+    if(!user){
+        return res.json({
+            msg: "Este usuario no se encuentra"
+        })
     }
-
-    // change public 
-    if (public) {
-        user.public = public
-    }
-
-    (await user.save()).isNew
 
     return res.status(200).json({
-        msj: "sesion iniciada correctamente", user
+        msg: "cambio realizado", user
     })
 
 }
@@ -270,7 +269,8 @@ module.exports = {
     viewUser,
     register,
     loginUser,
-    editUser,
+    editUserDirection,
+    editUserPublic,
     requestSend,
     myUser,
     getFriendsNumber,
