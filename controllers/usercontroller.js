@@ -176,10 +176,11 @@ const acceptFriend = async (req, res) => {
             msg: "usuario no encontrado"
         })
     }
-
-
+    
+    
     res.status(200).json({
-        msg: 'solicitud acceptada'
+        msg: 'solicitud acceptada',
+        myUser
     })
 }
 
@@ -251,6 +252,7 @@ const getUsersByID = async (req, res) => {
 const searchUsers = async (req, res) => {
     const myID = req.token
     const { usersID } = req.body
+
 
     const data = await User.find({ _id: { $in: usersID } })
 
