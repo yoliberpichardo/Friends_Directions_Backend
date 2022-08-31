@@ -32,11 +32,11 @@ const register = async (req, res) => {
     const { name, email, password } = req.body
 
     if (!name || !email || !password) {
-        return res.json({ msg: 'Please enter all fields' });
+        return res.json({ msg1: 'Please enter all fields' });
     }
 
     if (password.length < 6) {
-        return res.json({ msg: 'Password must be at least 6 characters' });
+        return res.json({ msg2: 'Password must be at least 6 characters' });
     }
 
     const passwordHash = await bcrypt.hash(password, 8)
@@ -62,14 +62,10 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email })
-    if (!user) {
-        return res.send({ msg: "este usuario no esta registrado" })
+    if (!user || !comparePassword) {
+        return res.send({ msg1: "este correo es incorrecto", msg2: "contraseña incorrecta"  })
     } else {
         comparePassword = bcrypt.compareSync(password, user.password)
-    }
-
-    if (!comparePassword) {
-        return res.send({ msg: "esta contraseña no es correcta, por favor verifica e introduzcala de nuevo" })
     }
 
     const token = await singInJWT(user)
@@ -85,6 +81,8 @@ const editUserDirection = async (req, res) => {
     const { direction } = req.body
 
     const user = await User.findByIdAndUpdate(myID, {$set: { 'direction': direction } }, { new: true })
+
+    console.log(user);
 
     if(!user){
         return res.json({
@@ -169,8 +167,6 @@ const acceptFriend = async (req, res) => {
     const myUser = await User.findByIdAndUpdate(myID, { $push: { 'friends': userID }, $pull: { 'request_received': userID } }, { new: true })
     const user = await User.findByIdAndUpdate(userID, { $push: { 'friends': myID }, $pull: { 'request_send': myID } }, { new: true })
 
-
-
     if (!user || !myUser) {
         return res.status(404).json({
             msg: "usuario no encontrado"
@@ -180,7 +176,8 @@ const acceptFriend = async (req, res) => {
     
     res.status(200).json({
         msg: 'solicitud acceptada',
-        myUser
+        myUser,
+        user
     })
 }
 
