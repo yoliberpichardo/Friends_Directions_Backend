@@ -62,8 +62,10 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email })
-    if (!user || !comparePassword) {
-        return res.send({ msg1: "este correo es incorrecto", msg2: "contraseña incorrecta"  })
+    if (!user) {
+        return res.send({ msg1: "este correo es incorrecto"})
+    } else if (!comparePassword) {
+        return res.send({ msg2: "contraseña incorrecta" })
     } else {
         comparePassword = bcrypt.compareSync(password, user.password)
     }
@@ -80,11 +82,11 @@ const editUserDirection = async (req, res) => {
     const myID = req.token
     const { direction } = req.body
 
-    const user = await User.findByIdAndUpdate(myID, {$set: { 'direction': direction } }, { new: true })
+    const user = await User.findByIdAndUpdate(myID, { $set: { 'direction': direction } }, { new: true })
 
     console.log(user);
 
-    if(!user){
+    if (!user) {
         return res.json({
             msg: "Este usuario no se encuentra"
         })
@@ -100,10 +102,10 @@ const editUserPublic = async (req, res) => {
     const myID = req.token
     const { isPublic } = req.body
 
-    
+
     const user = await User.findByIdAndUpdate(myID, { 'public': isPublic }, { new: true })
 
-    if(!user){
+    if (!user) {
         return res.json({
             msg: "Este usuario no se encuentra"
         })
@@ -172,8 +174,8 @@ const acceptFriend = async (req, res) => {
             msg: "usuario no encontrado"
         })
     }
-    
-    
+
+
     res.status(200).json({
         msg: 'solicitud acceptada',
         myUser,
