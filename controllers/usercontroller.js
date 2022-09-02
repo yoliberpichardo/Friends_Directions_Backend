@@ -62,12 +62,15 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email })
+
     if (!user) {
         return res.send({ msg1: "este correo es incorrecto"})
-    } else if (!comparePassword) {
-        return res.send({ msg2: "contraseña incorrecta" })
     } else {
         comparePassword = bcrypt.compareSync(password, user.password)
+    }
+
+    if (!comparePassword) {
+        return res.send({ msg2: "contraseña incorrecta" })
     }
 
     const token = await singInJWT(user)
